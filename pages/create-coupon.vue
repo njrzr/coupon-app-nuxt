@@ -1,49 +1,49 @@
 <template>
   <div class="relative z-0 p-2 pl-16 w-full h-screen">
-    <p class="relative w-4/12 text-white text-3xl font-semibold mx-auto mb-1 px-4 py-2 bg-blue-500 rounded-lg">Crear cupon</p>
+    <p class="relative md:w-4/12 text-white text-xl md:text-3xl font-semibold mx-auto mb-1 px-4 py-2 bg-blue-500 rounded-lg">Crear cupon</p>
 
-    <p v-if="state.isSuccess === 'success'" class="relative w-full text-white text-center text-3xl font-semibold mb-1 px-4 py-2 bg-green-500 rounded-lg overflow-hidden">
+    <p v-if="state.isSuccess === 'success'" class="relative w-full text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-green-500 rounded-lg overflow-hidden">
       {{ state.message }}
-      <i @click="() => state.isSuccess = ''" class="fa-solid fa-xmark absolute text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-green-400 justify-center items-center border-l-2"></i>
+      <i @click="() => state.isSuccess = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-green-400 justify-center items-center border-l-2"></i>
     </p>
     
-    <p v-if="state.error !== ''" class="relative w-full text-white text-center text-3xl font-semibold mb-1 px-4 py-2 bg-red-500 rounded-lg overflow-hidden">
+    <p v-if="state.error !== ''" class="relative w-full text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-red-500 rounded-lg overflow-hidden">
       {{ state.error }}
-      <i @click="() => state.error = ''" class="fa-solid fa-xmark absolute text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-red-400 justify-center items-center border-l-2"></i>
+      <i @click="() => state.error = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-red-400 justify-center items-center border-l-2"></i>
     </p>
     
-    <form @submit.prevent="createCoupon" class="relative flex flex-col gap-2 text-white bg-blue-500 rounded-lg mx-auto p-2 w-4/12">
-      <label class="text-xl font-bold flex justify-between items-center" for="coupon-store">
+    <form @submit.prevent="createCoupon" class="relative flex flex-col gap-2 text-white bg-blue-500 rounded-lg md:mx-auto p-2 md:w-4/12">
+      <label class="text-sm md:text-xl font-bold flex justify-between items-center" for="coupon-store">
         Tienda:
-        <input class="text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_store" id="coupon-store" type="text" placeholder="ej: Amazon">
+        <input class="w-2/3 md:w-auto text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_store" id="coupon-store" type="text" placeholder="ej: Amazon">
       </label>
-      <span v-if="errors.coupon_store" class="bg-red-400 p-1 rounded">{{ errors.coupon_store }}</span>
+      <span v-if="errors.coupon_store" class="text-sm  md:text-base bg-red-400 p-1 rounded">{{ errors.coupon_store }}</span>
 
-      <label class="text-xl font-bold flex justify-between items-center" for="coupon-code">
+      <label class="text-sm md:text-xl font-bold flex justify-between items-center" for="coupon-code">
         Codigo:
-        <input class="text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_code" id="coupon-code" type="text" placeholder="ej: CODIGO1234">
+        <input class="w-2/3 md:w-auto text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_code" id="coupon-code" type="text" placeholder="ej: CODIGO1234">
       </label>
-      <span v-if="errors.coupon_code" class="bg-red-400 p-1 rounded">{{ errors.coupon_code }}</span>
+      <span v-if="errors.coupon_code" class="text-sm  md:text-base bg-red-400 p-1 rounded">{{ errors.coupon_code }}</span>
 
-      <label class="text-xl font-bold flex justify-between items-center" for="coupon-quantity">
+      <label class="text-sm md:text-xl font-bold flex justify-between items-center" for="coupon-quantity">
         Cantidad:
-        <input class="text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_quantity" id="coupon-quantity" type="number" placeholder="ej: 50">
+        <input class="w-2/3 md:w-auto text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_quantity" id="coupon-quantity" type="number" placeholder="ej: 50">
       </label>
-      <span v-if="errors.coupon_quantity" class="bg-red-400 p-1 rounded">{{ errors.coupon_quantity }}</span>
+      <span v-if="errors.coupon_quantity" class="text-sm  md:text-base bg-red-400 p-1 rounded">{{ errors.coupon_quantity }}</span>
 
-      <label class="text-xl font-bold flex justify-between items-center" for="coupon-discount">
+      <label class="text-sm md:text-xl font-bold flex justify-between items-center" for="coupon-discount">
         Descuento:
-        <input class="text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_discount" id="coupon-discount" type="number" placeholder="ej: 5.45" step="0.01">
+        <input class="w-2/3 md:w-auto text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_discount" id="coupon-discount" type="number" placeholder="ej: 5.45" step="0.01">
       </label>
-      <span v-if="errors.coupon_discount" class="bg-red-400 p-1 rounded">{{ errors.coupon_discount }}</span>
+      <span v-if="errors.coupon_discount" class="text-sm  md:text-base bg-red-400 p-1 rounded">{{ errors.coupon_discount }}</span>
 
-      <label class="text-xl font-bold flex justify-between items-center" for="coupon-logo">
+      <label class="text-sm md:text-xl font-bold flex justify-between items-center" for="coupon-logo">
         Imagen:
-        <input class="text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_logo" id="coupon-logo" type="url" placeholder="ej: https://www.imageurl.png">
+        <input class="w-2/3 md:w-auto text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_logo" id="coupon-logo" type="url" placeholder="ej: https://www.imageurl.png">
       </label>
-      <span v-if="errors.coupon_logo" class="bg-red-400 p-1 rounded">{{ errors.coupon_logo }}</span>
+      <span v-if="errors.coupon_logo" class="text-sm  md:text-base bg-red-400 p-1 rounded">{{ errors.coupon_logo }}</span>
 
-      <button class="w-full text-xl mt-1 px-4 py-2 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="submit">Crear cupon</button>
+      <button class="w-full md:text-xl mt-1 px-4 py-2 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="submit">Crear cupon</button>
     </form>
   </div>
 </template>

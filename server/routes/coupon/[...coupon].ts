@@ -43,7 +43,7 @@ router.post('/create', defineEventHandler(async (event) => {
   });
 
   return {
-    message: 'Cupon creado correctamente.',
+    message: 'Cupon creado.',
     isSuccess: 'success'
   }
 }));
@@ -84,7 +84,7 @@ router.post('/update', defineEventHandler(async (event) => {
   await collection.updateOne({ _id: new ObjectId(query._id) }, { $set: changed });
 
   return {
-    message: 'Cupon actualizado correctamente.',
+    message: 'Cupon actualizado.',
     isSuccess: 'success'
   }
 }));
@@ -95,7 +95,7 @@ router.post('/delete', defineEventHandler(async (event) => {
   await collection.deleteOne({ _id: new ObjectId(query.id) });
 
   return {
-    message: 'Cupon borrado correctamente.',
+    message: 'Cupon borrado.',
     isSuccess: 'success'
   }
 }));
