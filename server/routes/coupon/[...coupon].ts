@@ -1,11 +1,11 @@
 import { createRouter, defineEventHandler, useBase } from 'h3'
 import { Double, Int32, MongoClient, ObjectId, ServerApiVersion } from 'mongodb'
 
-const user = ""
-const password = encodeURIComponent("://d47A_8@-sE")
-const uri = `mongodb+srv://${user}:${password}@developmentdb.g1e4gym.mongodb.net/?retryWrites=true&w=majority`
+const user = import.meta.env.VITE_USER
+const password = encodeURIComponent(`${import.meta.env.VITE_PASSWORD}`)
+const remote = `mongodb+srv://${user}:${password}@developmentdb.g1e4gym.mongodb.net/?retryWrites=true&w=majority`
 const local = "mongodb://127.0.0.1:27017"
-const client = new MongoClient(local, { serverApi: ServerApiVersion.v1 })
+const client = new MongoClient(remote, { serverApi: ServerApiVersion.v1 })
 
 const router = createRouter()
 let database: any

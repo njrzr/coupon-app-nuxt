@@ -6,7 +6,7 @@ const user = import.meta.env.VITE_USER
 const password = encodeURIComponent(`${import.meta.env.VITE_PASSWORD}`)
 const remote = `mongodb+srv://${user}:${password}@developmentdb.g1e4gym.mongodb.net/?retryWrites=true&w=majority`
 const local = "mongodb://127.0.0.1:27017"
-const client = new MongoClient(local, { serverApi: ServerApiVersion.v1 })
+const client = new MongoClient(remote, { serverApi: ServerApiVersion.v1 })
 
 let database: any
 let userAuth: any
