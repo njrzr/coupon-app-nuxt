@@ -1,15 +1,15 @@
 <template>
   <div class="relative z-0 p-2 pl-16 w-full h-screen">
     <p class="relative md:w-4/12 text-white text-xl md:text-3xl font-semibold mx-auto mb-1 px-4 py-2 bg-blue-500 rounded-lg">Crear cupon</p>
-
-    <p v-if="state.isSuccess === 'success'" class="relative w-full text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-green-500 rounded-lg overflow-hidden">
-      {{ state.message }}
-      <i @click="() => state.isSuccess = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-green-400 justify-center items-center border-l-2"></i>
+    
+    <p v-if="isSuccess === 'success'" class="relative md:w-4/12 mx-auto text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-green-500 rounded-lg overflow-hidden">
+      {{ successMessage }}
+      <i @click="() => isSuccess = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-green-400 justify-center items-center border-l-2"></i>
     </p>
     
-    <p v-if="state.error !== ''" class="relative w-full text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-red-500 rounded-lg overflow-hidden">
-      {{ state.error }}
-      <i @click="() => state.error = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-red-400 justify-center items-center border-l-2"></i>
+    <p v-if="isError !== ''" class="relative md:w-4/12 mx-auto text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-red-500 rounded-lg overflow-hidden">
+      {{ isError }}
+      <i @click="() => isError = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-red-400 justify-center items-center border-l-2"></i>
     </p>
     
     <form @submit.prevent="createCoupon" class="relative flex flex-col gap-2 text-white bg-blue-500 rounded-lg md:mx-auto p-2 md:w-4/12">
@@ -86,16 +86,18 @@
   );
 
   const { handleSubmit, errors } = useForm({ validationSchema });
-  let { value: coupon_store } = useField("coupon_store");
-  let { value: coupon_code } = useField("coupon_code");
-  let { value: coupon_quantity } = useField("coupon_quantity");
-  let { value: coupon_discount } = useField("coupon_discount");
-  let { value: coupon_logo } = useField("coupon_logo");
+  const { value: coupon_store } = useField("coupon_store");
+  const { value: coupon_code } = useField("coupon_code");
+  const { value: coupon_quantity } = useField("coupon_quantity");
+  const { value: coupon_discount } = useField("coupon_discount");
+  const { value: coupon_logo } = useField("coupon_logo");
 
-  let state = reactive({ message: '', isSuccess: '', error: '' });
+  const successMessage = ref('');
+  const isSuccess = ref('');
+  const isError = ref('');
 
   const createCoupon = handleSubmit(async () => {
-    const { data: status, error } = await useFetch("/coupon/create",
+    const { data: status, error, refresh } = await useFetch("/coupon/create",
       {
         params: { coupon_store, coupon_code, coupon_quantity, coupon_discount, coupon_logo },
         method: 'POST'
@@ -103,13 +105,13 @@
     );
 
     if (status.value !== null) {
-      state.message = status.value.message;
-      state.isSuccess = status.value.isSuccess;
+      successMessage.value = status.value.message;
+      isSuccess.value = status.value.isSuccess;
       await useFetch("/coupon/list");
     }
 
     if (error.value !== null) {
-      state.error = `${error.value.response?.statusText}`;
+      isError.value = `${error.value.response?.statusText}`;
     }
   });
 </script>

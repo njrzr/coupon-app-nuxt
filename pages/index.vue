@@ -21,20 +21,22 @@
     </div>
   </div>
 
-  <ClaimModal v-if="state.isOpen" @openModal="openModal" :couponId="state.couponId" />
+  <ClaimModal v-if="isOpen" @openModal="openModal" :couponId="couponId" />
 </template>
 
 <script setup lang="ts">
-  const { data: coupons } = await useFetch("/coupon/list");
-  const state = reactive({ isOpen: false, couponId: '' })
+  const { data: coupons, refresh } = await useFetch("/coupon/list");
+  const isOpen = ref(false);
+  const couponId = ref('');
 
   const openModal = (data: string = '') => {
-    if (state.couponId != '') {
-      state.couponId = '';
+    if (couponId.value != '') {
+      couponId.value = '';
     } else {
-      state.couponId = data;
+      couponId.value = data;
     }
 
-    state.isOpen = !state.isOpen;
+    isOpen.value = !isOpen.value;
+    refresh();
   };
 </script>

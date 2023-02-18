@@ -14,7 +14,8 @@ export default defineNuxtConfig({
           src: 'https://kit.fontawesome.com/4cd87bf5ed.js',
           crossorigin: 'anonymous'
         }
-      ]
+      ],
+      title: "Coupon App"
     }
   },
   modules: ['@sidebase/nuxt-auth']

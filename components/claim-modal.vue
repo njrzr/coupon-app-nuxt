@@ -2,14 +2,14 @@
   <div class="absolute top-0 left-0 bg-black bg-opacity-75 p-2 pl-16 w-full h-screen">
     <i @click="$emit('openModal')" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-4 right-4 rounded-full w-6 h-6 md:w-10 md:h-10 flex justify-center items-center bg-white hover:bg-gray-400 hover:text-white transition duration-200"></i>
 
-    <p v-if="state.isSuccess === 'success'" class="relative w-full text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-green-500 rounded-lg overflow-hidden">
-      {{ state.message }}
-      <i @click="() => state.isSuccess = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-green-400 justify-center items-center border-l-2"></i>
+    <p v-if="isSuccess === 'success'" class="relative w-full text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-green-500 rounded-lg overflow-hidden">
+      {{ successMessage }}
+      <i @click="() => isSuccess = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-green-400 justify-center items-center border-l-2"></i>
     </p>
     
-    <p v-if="state.error !== ''" class="relative w-full text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-red-500 rounded-lg overflow-hidden">
-      {{ state.error }}
-      <i @click="() => state.error = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-red-400 justify-center items-center border-l-2"></i>
+    <p v-if="isError !== ''" class="relative w-full text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-red-500 rounded-lg overflow-hidden">
+      {{ isError }}
+      <i @click="() => isError = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-red-400 justify-center items-center border-l-2"></i>
     </p>
 
     <div class="mx-auto md:w-4/12 px-4 py-2 bg-blue-500 text-white text-xl md:text-3xl font-semibold rounded-lg">Canjear cupon</div>
@@ -45,8 +45,10 @@
   import { toFormValidator } from "@vee-validate/zod";
   import * as zod from "zod";
 
-  const props = defineProps(['couponId'])
-  const state = reactive({ message: '', isSuccess: '', error: '' });
+  const props = defineProps(['couponId']);
+  const successMessage = ref('');
+  const isSuccess = ref('');
+  const isError = ref('');
 
   const validationSchema = toFormValidator(
     zod.object({
@@ -80,12 +82,13 @@
     });
 
     if (status.value !== null) {
-      state.message = status.value.message;
-      state.isSuccess = status.value.isSuccess;
+      successMessage.value = status.value.message;
+      isSuccess.value = status.value.isSuccess;
+      await useFetch("/coupon/list");
     }
 
     if (error.value !== null) {
-      state.error = `${error.value.response?.statusText}`;
+      isError.value = `${error.value.response?.statusText}`;
     }
   }));
 </script>
