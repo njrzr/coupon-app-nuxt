@@ -19,54 +19,64 @@
         </div>
         
         <div class="flex gap-1 mt-1">
-          <button @click.prevent="openModal(coupon)" class="w-1/2 p-1 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="submit">Modificar</button>
+          <button @click.prevent="toggleUpdate(coupon)" class="w-1/2 p-1 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="submit">Modificar</button>
 
-          <button @click="deleteCoupon(coupon._id)" class="w-1/2 p-1 rounded-lg text-white font-semibold bg-red-400 hover:bg-red-300 active:bg-red-500 transition duration-200" type="submit">Eliminar</button>
+          <button @click="toggleConfirm(coupon._id)" class="w-1/2 p-1 rounded-lg text-white font-semibold bg-red-400 hover:bg-red-300 active:bg-red-500 transition duration-200" type="submit">Eliminar</button>
         </div>
       </div>
     </div>
 
-    <UpdateModal v-if="isOpen" @openModal="openModal" :couponData="couponData" />
+    <UpdateModal v-if="isUpdate" @toggleUpdate="toggleUpdate" :couponData="couponData" />
+    <ConfirmModal v-if="isConfirm" @toggleConfirm="toggleConfirm" @deleteCoupon="deleteCoupon" :couponId="couponId" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { redirect } from 'next/dist/server/api-utils';
-
   definePageMeta({ middleware: 'auth' });
   let couponData: string[] = []
 
   const { data: coupons, refresh } = await useFetch("/coupon/list");
-  const isOpen = ref(false);
+  const isUpdate = ref(false);
+  const isConfirm = ref(false);
   const successMessage = ref('');
   const isSuccess = ref('');
+  const couponId = ref('');
 
-  const openModal = (data: any = []) => {
+  const toggleUpdate = (data: string | any = []) => {
     if (couponData.length != 0) {
       couponData = [];
     } else {
       couponData.push(data);
     }
 
-    isOpen.value = !isOpen.value;
+    isUpdate.value = !isUpdate.value;
     refresh();
   };
 
-  const deleteCoupon = async (id: string) => {
-    if (confirm('¿Desea borrar este cupon?')) {
-      const { data: status, error } = await useFetch("/coupon/delete",
-        {
-          params: { id },
-          method: 'POST'
-        }
-      );
+  const toggleConfirm = (id: string = '') => {
+    if (couponId.value.length != 0) {
+      couponId.value = '';
+    } else {
+      couponId.value = id;
+    }
+    
+    isConfirm.value = !isConfirm.value;
+  }
 
-      if (status.value !== null) {
-        isSuccess.value = status.value.isSuccess;
-        successMessage.value = status.value.message;
-        await useFetch("/coupon/list");
-        refresh();
+  const deleteCoupon = async (id: string) => {
+    const { data: status } = await useFetch("/coupon/delete",
+      {
+        params: { id },
+        method: 'POST'
       }
+    );
+
+    if (status.value !== null) {
+      isSuccess.value = status.value.isSuccess;
+      successMessage.value = status.value.message;
+      isConfirm.value = !isConfirm.value;
+      coupons.value = coupons.value.filter((value: any) => value._id !== id);
+      await useFetch("/coupon/list");
     }
   }
 </script>

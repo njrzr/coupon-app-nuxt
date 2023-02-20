@@ -1,6 +1,6 @@
 <template>
   <div class="absolute top-0 left-0 bg-black bg-opacity-75 p-2 pl-16 w-full h-screen">
-    <i @click="$emit('openModal')" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-4 right-4 rounded-full w-6 h-6 md:w-10 md:h-10 flex justify-center items-center bg-white hover:bg-gray-400 hover:text-white transition duration-200"></i>
+    <i @click="$emit('toggleUpdate')" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-4 right-4 rounded-full w-6 h-6 md:w-10 md:h-10 flex justify-center items-center bg-white hover:bg-gray-400 hover:text-white transition duration-200"></i>
 
     <p v-if="isSuccess === 'success'" class="relative w-full text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-green-500 rounded-lg overflow-hidden">{{ successMessage }}<i @click="() => isSuccess = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-green-400 justify-center items-center border-l-2"></i></p>
 
