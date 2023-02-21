@@ -34,7 +34,9 @@
         </label>
         <span v-if="errors.telephone" class="bg-red-400 p-1 rounded text-sm md:text-base">{{ errors.telephone }}</span>
 
-        <button @click="claimCoupon" class="w-full md:text-xl mt-1 px-4 py-2 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="submit">Canjear cupon</button>
+        <button @click="claimCoupon" :class="['w-full', 'md:text-xl', 'mt-1', 'px-4', 'py-2', 'rounded-lg', 'text-white', 'font-semibold', 'transition', 'duration-200', isClaimed ? 'bg-gray-400' : 'bg-green-400 hover:bg-green-300 active:bg-green-500']" type="submit" :disabled="isClaimed">
+          {{ isClaimed ? 'Deshabilitado' : 'Canjear cupon' }}
+        </button>
       </form>
     </div>
   </div>
@@ -49,6 +51,7 @@
   const successMessage = ref('');
   const isSuccess = ref('');
   const isError = ref('');
+  const isClaimed = ref(false);
 
   const validationSchema = toFormValidator(
     zod.object({
@@ -84,6 +87,7 @@
     if (status.value !== null) {
       successMessage.value = status.value.message;
       isSuccess.value = status.value.isSuccess;
+      isClaimed.value = !isClaimed.value;
       await useFetch("/coupon/list");
     }
 

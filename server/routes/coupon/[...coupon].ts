@@ -1,11 +1,33 @@
 import { createRouter, defineEventHandler, useBase } from 'h3'
-import { Double, Int32, MongoClient, ObjectId, ServerApiVersion } from 'mongodb'
+import { Double, Int32, MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
+import nodemailer from 'nodemailer';
 
-const user = import.meta.env.VITE_USER
-const password = encodeURIComponent(`${import.meta.env.VITE_PASSWORD}`)
-const remote = `mongodb+srv://${user}:${password}@developmentdb.g1e4gym.mongodb.net/?retryWrites=true&w=majority`
-const local = "mongodb://127.0.0.1:27017"
-const client = new MongoClient(remote, { serverApi: ServerApiVersion.v1 })
+const user = import.meta.env.VITE_USER;
+const password = encodeURIComponent(`${import.meta.env.VITE_PASSWORD}`);
+const remote = `mongodb+srv://${user}:${password}@developmentdb.g1e4gym.mongodb.net/?retryWrites=true&w=majority`;
+const local = "mongodb://127.0.0.1:27017";
+const client = new MongoClient(remote, { serverApi: ServerApiVersion.v1 });
+
+// let transport = nodemailer.createTransport({
+//   host: "sandbox.smtp.mailtrap.io",
+//   port: 2525,
+//   auth: {
+//     user: import.meta.env.VITE_MAILTRAP_USER,
+//     pass: import.meta.env.VITE_MAILTRAP_PASS
+//   }
+// });
+
+let transport = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    type: 'OAuth2',
+    user: import.meta.env.VITE_GMAIL_USER,
+    pass: import.meta.env.VITE_GMAIL_PASS,
+    clientId: import.meta.env.VITE_GMAIL_OAUTH_CLIENTID,
+    clientSecret: import.meta.env.VITE_GMAIL_OAUTH_CLIENT_SECRET,
+    refreshToken: import.meta.env.VITE_GMAIL_OAUTH_REFRESH_TOKEN
+  }
+});
 
 const router = createRouter()
 let database: any
@@ -15,9 +37,9 @@ let newUser: any
 
 (async () => {
   await client.connect()
-  database = client.db("coupon")
-  collection = database.collection("coupon");
-  newUser = database.collection("user");
+  database = client.db(`${import.meta.env.VITE_DB}`);
+  collection = database.collection(`${import.meta.env.VITE_COLLECTION_ONE}`);
+  newUser = database.collection(`${import.meta.env.VITE_COLLECTION_TWO}`);
 })()
 
 router.get('/list', defineEventHandler((event) => {
@@ -50,6 +72,56 @@ router.post('/create', defineEventHandler(async (event) => {
 
 router.post('/claim', defineEventHandler(async (event) => {
   const query = getQuery(event);
+  const dbQuery = collection.find({ _id: new ObjectId(query.id) });
+  const coupon = await dbQuery.toArray(); 
+
+  const message = (coupon: any, user: any) => {
+    return `
+      <head>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+
+          .container {
+            background: #1e90ff;
+            border-radius: 12px;
+            padding: 1.25rem;
+            color: #ffffff;
+          }
+
+          .title {
+            border-left: 0.5rem solid #ffffff;
+            margin-bottom: 1rem;
+            padding-left: 0.5rem
+          }
+
+          .text {
+            border-right: 4px solid #ffffff;
+            padding: 0.5rem 0 0.5rem 1rem;
+          }
+        </style>
+      </head>
+
+      <div class="container">
+        <h1 class="title">Felicidades ${user.username} aqui esta tu cupon.</h1>
+        <h3 class="text">Tienda: ${coupon.store}</h3>
+        <h3 class="text">Codigo: ${coupon.coupon_code}</h3>
+        <h3 class="text">Descuento: ${coupon.coupon_discount}$</h3>
+      </div>
+    `
+  }
+
+  let info = await transport.sendMail({
+    from: "CouponApp 🎫 <noreply@couponapp.com>",
+    to: `${query.email}`,
+    subject: `Hola ${query.username}, recibiste un cupon.`,
+    html: message(coupon[0], query),
+  });
+
+  console.log("Correo enviado: %s", info.messageId);
 
   await newUser.insertOne({ 
     username: query.username,

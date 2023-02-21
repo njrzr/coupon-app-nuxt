@@ -35,11 +35,7 @@
   const mySignInHandler = async () => {
     const { error } = await signIn('credentials', {email: email.value, password: password.value, redirect: false});
     
-    if (error !== null) {
-      signError.value = !signError.value;
-    } else {
-      return navigateTo('/', { external: false });
-    }
+    if (error !== null) signError.value = !signError.value;
   }
 
   watchEffect(() => {
