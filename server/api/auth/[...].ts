@@ -8,15 +8,13 @@ const remote = `mongodb+srv://${user}:${password}@developmentdb.g1e4gym.mongodb.
 const local = "mongodb://127.0.0.1:27017";
 const client = new MongoClient(remote, { serverApi: ServerApiVersion.v1 });
 
-let database: any;
-let collection: any;
-let userAuth: any;
-
 (async () => {
-  await client.connect().then(res => console.log('Connected to database.')).catch(err => console.log(err));
-  database = client.db(`${import.meta.env.VITE_DB}`);
-  collection = database.collection("admin");
+  await client.connect().then(res => console.log('Connected to DB from Auth.')).catch(err => console.log(err));
 })()
+
+const database: any = client.db(`${import.meta.env.VITE_DB}`);
+const collection: any = database.collection("admin");
+let userAuth: any;
 
 export default NuxtAuthHandler({
   // A secret string you define, to ensure correct encryption
@@ -28,8 +26,8 @@ export default NuxtAuthHandler({
     // @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
     CredentialsProvider.default({
       async authorize (credentials: any) {
-        const find = collection.find({ email: credentials.email });
-        userAuth = await find.toArray();
+        const search = collection.find({ email: credentials.email });
+        userAuth = await search.toArray();
 
         if (userAuth.length !== 0) {
           if (credentials.password === userAuth[0].password) return credentials

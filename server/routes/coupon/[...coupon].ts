@@ -2,20 +2,20 @@ import { createRouter, defineEventHandler, useBase } from 'h3'
 import { Double, Int32, MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
 import nodemailer from 'nodemailer';
 
+const router = createRouter();
 const user = import.meta.env.VITE_USER;
 const password = encodeURIComponent(`${import.meta.env.VITE_PASSWORD}`);
 const remote = `mongodb+srv://${user}:${password}@developmentdb.g1e4gym.mongodb.net/?retryWrites=true&w=majority`;
 const local = "mongodb://127.0.0.1:27017";
 const client = new MongoClient(remote, { serverApi: ServerApiVersion.v1 });
 
-// let transport = nodemailer.createTransport({
-//   host: "sandbox.smtp.mailtrap.io",
-//   port: 2525,
-//   auth: {
-//     user: import.meta.env.VITE_MAILTRAP_USER,
-//     pass: import.meta.env.VITE_MAILTRAP_PASS
-//   }
-// });
+(async () => {
+  await client.connect().then(() => console.log("Connected to DB from Coupon.")).catch(err => console.log(err));
+})();
+
+const database: any = client.db(`${import.meta.env.VITE_DB}`);
+const collection: any = database.collection(`${import.meta.env.VITE_COLLECTION_ONE}`);
+const newUser: any = database.collection(`${import.meta.env.VITE_COLLECTION_TWO}`);
 
 let transport = nodemailer.createTransport({
   service: 'gmail',
@@ -29,27 +29,10 @@ let transport = nodemailer.createTransport({
   }
 });
 
-const router = createRouter()
-let database: any
-let coupons: any
-let collection: any
-let newUser: any
-
-(async () => {
-  await client.connect()
-  database = client.db(`${import.meta.env.VITE_DB}`);
-  collection = database.collection(`${import.meta.env.VITE_COLLECTION_ONE}`);
-  newUser = database.collection(`${import.meta.env.VITE_COLLECTION_TWO}`);
-})()
-
-router.get('/list', defineEventHandler((event) => {
-  (async () => {
-    const find = collection.find({});
-    const result = await find.toArray();
-    coupons = result;
-  })()
-
-  return coupons;
+router.get('/list', defineEventHandler(async (event) => {
+  const search = collection.find({});
+  const result = await search.toArray();
+  return result;
 }))
 
 router.post('/create', defineEventHandler(async (event) => {
@@ -72,8 +55,8 @@ router.post('/create', defineEventHandler(async (event) => {
 
 router.post('/claim', defineEventHandler(async (event) => {
   const query = getQuery(event);
-  const dbQuery = collection.find({ _id: new ObjectId(query.id) });
-  const coupon = await dbQuery.toArray(); 
+  const search = collection.find({ _id: new ObjectId(query.id) });
+  const coupon = await search.toArray(); 
 
   const message = (coupon: any, user: any) => {
     return `
@@ -141,11 +124,11 @@ router.post('/claim', defineEventHandler(async (event) => {
 router.post('/update', defineEventHandler(async (event) => {
   const query = getQuery(event);
 
-  const dbQuery = collection.find({ _id: new ObjectId(query._id) })
-  const findArray = await dbQuery.toArray();
+  const search = collection.find({ _id: new ObjectId(query._id) })
+  const coupon = await search.toArray();
 
   const changed = Object.keys(query).reduce((obj: any, value: any) => {
-    if (query[value] != findArray[0][value]) {
+    if (query[value] != coupon[0][value]) {
       if (value == 'quantity') obj[value] = new Int32(query[value]);
       else if (value == 'coupon_discount') obj[value] = new Double(query[value]);
       else obj[value] = query[value];
