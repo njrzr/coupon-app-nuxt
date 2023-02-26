@@ -1,5 +1,5 @@
 <template>
-  <div class="relative z-0 p-2 pl-16 w-full h-screen">
+  <div class="relative z-0 p-2 pl-16 w-full h-screen overflow-auto">
     <p class="relative w-full text-white text-xl md:text-3xl font-semibold mb-1 px-4 py-2 bg-blue-500 rounded-lg">Cupones disponibles</p>
     
     <div class="relative grid grid-cols-1 md:grid-cols-4 gap-1">

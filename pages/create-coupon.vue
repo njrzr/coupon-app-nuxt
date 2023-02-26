@@ -1,5 +1,5 @@
 <template>
-  <div class="relative z-0 p-2 pl-16 w-full h-screen">
+  <div class="relative z-0 p-2 pl-16 w-full h-screen overflow-auto">
     <p class="relative md:w-4/12 text-white text-xl md:text-3xl font-semibold mx-auto mb-1 px-4 py-2 bg-blue-500 rounded-lg">Crear cupon</p>
     
     <p v-if="isSuccess === 'success'" class="relative md:w-4/12 mx-auto text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-green-500 rounded-lg overflow-hidden">
@@ -12,7 +12,7 @@
       <i @click="() => isError = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-red-400 justify-center items-center border-l-2"></i>
     </p>
     
-    <form @submit.prevent="createCoupon" class="relative flex flex-col gap-2 text-white bg-blue-500 rounded-lg md:mx-auto p-2 md:w-4/12">
+    <form @keydown.stop @keyup.stop class="relative flex flex-col gap-2 text-white bg-blue-500 rounded-lg md:mx-auto p-2 md:w-4/12">
       <label class="text-sm md:text-xl font-bold flex justify-between items-center" for="coupon-store">
         Tienda:
         <input class="w-2/3 md:w-auto text-black text-base font-normal p-2 rounded-lg outline-none" v-model="coupon_store" id="coupon-store" type="text" placeholder="ej: Amazon">
@@ -43,7 +43,7 @@
       </label>
       <span v-if="errors.coupon_logo" class="text-sm  md:text-base bg-red-400 p-1 rounded">{{ errors.coupon_logo }}</span>
 
-      <button class="w-full md:text-xl mt-1 px-4 py-2 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="submit">Crear cupon</button>
+      <button @click.prevent="createCoupon" class="w-full md:text-xl mt-1 px-4 py-2 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="button">Crear cupon</button>
     </form>
   </div>
 </template>
@@ -97,21 +97,20 @@
   const isError = ref('');
 
   const createCoupon = handleSubmit(async () => {
-    const { data: status, error, refresh } = await useFetch("/coupon/create",
-      {
-        params: { coupon_store, coupon_code, coupon_quantity, coupon_discount, coupon_logo },
-        method: 'POST'
-      }
-    );
-
-    if (status.value !== null) {
-      successMessage.value = status.value.message;
-      isSuccess.value = status.value.isSuccess;
-      await useFetch("/coupon/list");
-    }
-
-    if (error.value !== null) {
-      isError.value = `${error.value.response?.statusText}`;
-    }
+    await $fetch("/coupon/create", {
+        method: 'POST',
+        body: {
+          store: coupon_store.value,
+          code: coupon_code.value,
+          quantity: coupon_quantity.value,
+          discount: coupon_discount.value,
+          logo: coupon_logo.value 
+        }
+    }).then(response => {
+      successMessage.value = response.message;
+      isSuccess.value = response.isSuccess;
+    }).catch(err => {
+      isError.value = 'Error interno del servidor.';
+    });
   });
 </script>

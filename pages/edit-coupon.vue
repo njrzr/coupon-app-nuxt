@@ -1,5 +1,5 @@
 <template>
-  <div class="relative z-0 p-2 pl-16 w-full h-screen">
+  <div class="relative z-0 p-2 pl-16 w-full h-screen overflow-auto">
     <p class="relative w-full text-white text-xl md:text-3xl font-semibold mb-1 px-4 py-2 bg-blue-500 rounded-lg">Editar cupon</p>
 
     <p v-if="isSuccess === 'success'" class="relative w-full text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-green-500 rounded-lg overflow-hidden">{{ successMessage }}<i @click="() => isSuccess = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-green-400 justify-center items-center border-l-2"></i></p>
@@ -19,7 +19,7 @@
         </div>
         
         <div class="flex gap-1 mt-1">
-          <button @click.prevent="toggleUpdate(coupon)" class="w-1/2 p-1 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="submit">Modificar</button>
+          <button @click="toggleUpdate(coupon)" class="w-1/2 p-1 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="submit">Modificar</button>
 
           <button @click="toggleConfirm(coupon._id)" class="w-1/2 p-1 rounded-lg text-white font-semibold bg-red-400 hover:bg-red-300 active:bg-red-500 transition duration-200" type="submit">Eliminar</button>
         </div>
@@ -54,29 +54,19 @@
   };
 
   const toggleConfirm = (id: string = '') => {
-    if (couponId.value.length != 0) {
-      couponId.value = '';
-    } else {
-      couponId.value = id;
-    }
-    
+    couponId.value = id;
     isConfirm.value = !isConfirm.value;
   }
 
   const deleteCoupon = async (id: string) => {
-    const { data: status } = await useFetch("/coupon/delete",
-      {
-        params: { id },
-        method: 'POST'
-      }
-    );
-
-    if (status.value !== null) {
-      isSuccess.value = status.value.isSuccess;
-      successMessage.value = status.value.message;
+    await $fetch("/coupon/delete", {
+      method: 'POST',
+      body: { id: id }
+    }).then(response => {
+      isSuccess.value = response.isSuccess;
+      successMessage.value = response.message;
       isConfirm.value = !isConfirm.value;
       coupons.value = coupons.value.filter((value: any) => value._id !== id);
-      await useFetch("/coupon/list");
-    }
+    }).catch(err => {});
   }
 </script>

@@ -1,5 +1,6 @@
 import { createRouter, defineEventHandler, useBase } from 'h3'
 import { Double, Int32, MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
+// @ts-ignore - Could not find a declaration file for module 'nodemailer'.
 import nodemailer from 'nodemailer';
 
 const router = createRouter();
@@ -36,14 +37,14 @@ router.get('/list', defineEventHandler(async (event) => {
 }))
 
 router.post('/create', defineEventHandler(async (event) => {
-  const query = getQuery(event);
+  const body = await readBody(event);
 
   await collection.insertOne({ 
-    store: query.coupon_store,
-    coupon_code: query.coupon_code,
-    quantity: new Int32(query.coupon_quantity),
-    store_image: query.coupon_logo,
-    coupon_discount: new Double(query.coupon_discount),
+    store: body.store,
+    coupon_code: body.code,
+    quantity: new Int32(body.quantity),
+    store_image: body.logo,
+    coupon_discount: new Double(body.discount),
     claimed: new Int32(0)
   });
 
@@ -54,8 +55,8 @@ router.post('/create', defineEventHandler(async (event) => {
 }));
 
 router.post('/claim', defineEventHandler(async (event) => {
-  const query = getQuery(event);
-  const search = collection.find({ _id: new ObjectId(query.id) });
+  const body = await readBody(event);
+  const search = collection.find({ _id: new ObjectId(body.id) });
   const coupon = await search.toArray(); 
 
   const message = (coupon: any, user: any) => {
@@ -89,7 +90,7 @@ router.post('/claim', defineEventHandler(async (event) => {
       </head>
 
       <div class="container">
-        <h1 class="title">Felicidades ${user.username} aqui esta tu cupon.</h1>
+        <h1 class="title">Felicidades ${user.user} aqui esta tu cupon.</h1>
         <h3 class="text">Tienda: ${coupon.store}</h3>
         <h3 class="text">Codigo: ${coupon.coupon_code}</h3>
         <h3 class="text">Descuento: ${coupon.coupon_discount}$</h3>
@@ -99,21 +100,19 @@ router.post('/claim', defineEventHandler(async (event) => {
 
   let info = await transport.sendMail({
     from: "CouponApp 🎫 <noreply@couponapp.com>",
-    to: `${query.email}`,
-    subject: `Hola ${query.username}, recibiste un cupon.`,
-    html: message(coupon[0], query),
+    to: `${body.email}`,
+    subject: `Hola ${body.user}, recibiste un cupon.`,
+    html: message(coupon[0], body),
   });
-
-  console.log("Correo enviado: %s", info.messageId);
 
   await newUser.insertOne({ 
-    username: query.username,
-    email: query.email,
-    phone_number: query.telephone,
-    coupon_id: query.id
+    username: body.user,
+    email: body.email,
+    phone_number: body.tel,
+    coupon_id: body.id
   });
 
-  await collection.updateOne({ _id: new ObjectId(query.id) }, { $inc: { claimed: 1 } });
+  await collection.updateOne({ _id: new ObjectId(body.id) }, { $inc: { claimed: 1 } });
 
   return {
     message: 'Cupon reclamado.',
@@ -122,21 +121,21 @@ router.post('/claim', defineEventHandler(async (event) => {
 }));
 
 router.post('/update', defineEventHandler(async (event) => {
-  const query = getQuery(event);
+  const body = await readBody(event);
 
-  const search = collection.find({ _id: new ObjectId(query._id) })
+  const search = collection.find({ _id: new ObjectId(body._id) })
   const coupon = await search.toArray();
 
-  const changed = Object.keys(query).reduce((obj: any, value: any) => {
-    if (query[value] != coupon[0][value]) {
-      if (value == 'quantity') obj[value] = new Int32(query[value]);
-      else if (value == 'coupon_discount') obj[value] = new Double(query[value]);
-      else obj[value] = query[value];
+  const updated = Object.keys(body).reduce((obj: any, value: any) => {
+    if (body[value] != coupon[0][value]) {
+      if (value == 'quantity') obj[value] = new Int32(body[value]);
+      else if (value == 'coupon_discount') obj[value] = new Double(body[value]);
+      else obj[value] = body[value];
     }
     return obj;
   }, {});
 
-  await collection.updateOne({ _id: new ObjectId(query._id) }, { $set: changed });
+  await collection.updateOne({ _id: new ObjectId(body._id) }, { $set: updated });
 
   return {
     message: 'Cupon actualizado.',
@@ -145,9 +144,8 @@ router.post('/update', defineEventHandler(async (event) => {
 }));
 
 router.post('/delete', defineEventHandler(async (event) => {
-  const query = getQuery(event);
-
-  await collection.deleteOne({ _id: new ObjectId(query.id) });
+  const body = await readBody(event);
+  await collection.deleteOne({ _id: new ObjectId(body.id) });
 
   return {
     message: 'Cupon borrado.',

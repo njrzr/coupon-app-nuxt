@@ -1,5 +1,5 @@
 <template>
-  <div class="relative z-0 p-2 pl-16 w-full h-screen">
+  <div class="relative z-0 p-2 pl-16 w-full h-screen overflow-auto">
     <p class="relative md:w-1/4 mx-auto md:mt-12 text-2xl font-semibold mb-4 p-2 md:p-4 rounded-lg border-2 border-blue-600">Iniciar sesion</p>
 
     <form method="POST" @submit.prevent="mySignInHandler" class="relative md:w-1/4 p-2 md:p-4 mx-auto mt-4 rounded-lg border-2 border-blue-600">
