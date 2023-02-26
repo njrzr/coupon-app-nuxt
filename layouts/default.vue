@@ -1,7 +1,7 @@
 <template>
   <div class="relative w-full h-screen select-none">
     <div class="fixed flex flex-col p-2 gap-2 items-center z-10 w-14 h-screen bg-blue-500">
-      <NuxtLink :class="[links, { 'bg-gray-600': route.name !== 'login' && route.name !== 'logout', 'bg-red-600': route.name === 'logout' }, 'transition', 'duration-200', 'hover:bg-gray-400']" 
+      <NuxtLink :class="[links, { 'bg-gray-600': route.name !== 'login' && route.name !== 'logout', 'bg-red-600': route.name === 'logout' }, 'md:transition', 'md:duration-200', 'md:hover:bg-gray-400']" 
         v-for="route in $router.options.routes"
         :to="route.path"
         :title="titles[route.name]"
@@ -10,7 +10,7 @@
         <i :class="[icons[route.name], 'text-white']"></i>
       </NuxtLink>
 
-      <NuxtLink :class="[links, 'bg-gray-600', 'transition', 'duration-200', 'hover:bg-gray-400']"
+      <NuxtLink :class="[links, 'bg-gray-600', 'md:transition', 'md:duration-200', 'md:hover:bg-gray-400']"
         to="/"
         :title="titles['index']"
         key="index-unauth"
@@ -18,7 +18,7 @@
         <i :class="[icons['index'], 'text-white']"></i>
       </NuxtLink>
 
-      <NuxtLink :class="[links, 'bg-blue-600', 'transition', 'duration-200', 'hover:bg-blue-400']"
+      <NuxtLink :class="[links, 'bg-blue-600', 'md:transition', 'md:duration-200', 'md:hover:bg-blue-400']"
         to="/login"
         :title="titles['login']"
         key="login"
@@ -26,7 +26,7 @@
         <i :class="[icons['login'], 'text-white']"></i>
       </NuxtLink>
 
-      <button title="Cerrar Sesion" @click="signOut()" :class="[links, 'bg-red-600', 'transition', 'duration-200', 'active:bg-red-500', 'hover:bg-red-400']" v-show="status === 'authenticated'">
+      <button title="Cerrar Sesion" @click="signOut()" :class="[links, 'bg-red-600', 'md:transition', 'md:duration-200', 'md:active:bg-red-500', 'md:hover:bg-red-400']" v-show="status === 'authenticated'">
         <i :class="[icons['logout'], 'text-white']"></i>
       </button>
     </div>

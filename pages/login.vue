@@ -15,7 +15,7 @@
 
       <p @click="closeError" v-if="signError" class="w-full rounded-lg my-2 p-2 text-sm text-white font-semibold text-center bg-red-400 cursor-pointer">Correo o contraseña incorrectos.</p>
       
-      <button class="w-full my-1 px-4 py-2 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="submit">Entrar</button>
+      <button class="w-full my-1 px-4 py-2 rounded-lg text-white font-semibold bg-green-400 md:hover:bg-green-300 md:active:bg-green-500 md:transition md:duration-200" type="submit">Entrar</button>
     </form>
   </div>
 </template>

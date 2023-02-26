@@ -4,12 +4,12 @@
     
     <p v-if="isSuccess === 'success'" class="relative md:w-4/12 mx-auto text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-green-500 rounded-lg overflow-hidden">
       {{ successMessage }}
-      <i @click="() => isSuccess = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-green-400 justify-center items-center border-l-2"></i>
+      <i @click="() => isSuccess = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex md:hover:bg-green-400 justify-center items-center border-l-2"></i>
     </p>
     
     <p v-if="isError !== ''" class="relative md:w-4/12 mx-auto text-white md:text-center md:text-3xl font-semibold mb-1 px-4 py-2 bg-red-500 rounded-lg overflow-hidden">
       {{ isError }}
-      <i @click="() => isError = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex hover:bg-red-400 justify-center items-center border-l-2"></i>
+      <i @click="() => isError = ''" class="fa-solid fa-xmark absolute md:text-xl cursor-pointer top-0 right-0 w-12 h-full flex md:hover:bg-red-400 justify-center items-center border-l-2"></i>
     </p>
     
     <form @keydown.stop @keyup.stop class="relative flex flex-col gap-2 text-white bg-blue-500 rounded-lg md:mx-auto p-2 md:w-4/12">
@@ -43,7 +43,7 @@
       </label>
       <span v-if="errors.coupon_logo" class="text-sm  md:text-base bg-red-400 p-1 rounded">{{ errors.coupon_logo }}</span>
 
-      <button @click.prevent="createCoupon" class="w-full md:text-xl mt-1 px-4 py-2 rounded-lg text-white font-semibold bg-green-400 hover:bg-green-300 active:bg-green-500 transition duration-200" type="button">Crear cupon</button>
+      <button @click.prevent="createCoupon" class="w-full md:text-xl mt-1 px-4 py-2 rounded-lg text-white font-semibold bg-green-400 md:hover:bg-green-300 md:active:bg-green-500 md:transition md:duration-200" type="button">Crear cupon</button>
     </form>
   </div>
 </template>
